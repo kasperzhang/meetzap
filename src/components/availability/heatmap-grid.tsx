@@ -20,11 +20,12 @@ function getHeatmapColor(count: number, total: number): string {
 
   const ratio = count / total;
 
-  if (ratio === 1) return "bg-emerald-600";
-  if (ratio >= 0.75) return "bg-emerald-500";
-  if (ratio >= 0.5) return "bg-emerald-400";
-  if (ratio >= 0.25) return "bg-emerald-300";
-  return "bg-emerald-200";
+  // Light to dark teal gradient - matches neo-brutalism accent (#4ECDC4)
+  if (ratio === 1) return "bg-[#0d9488]";      // teal-600 (darkest)
+  if (ratio >= 0.75) return "bg-[#14b8a6]";    // teal-500
+  if (ratio >= 0.5) return "bg-[#2dd4bf]";     // teal-400
+  if (ratio >= 0.25) return "bg-[#5eead4]";    // teal-300
+  return "bg-[#99f6e4]";                        // teal-200 (lightest)
 }
 
 export function HeatmapGrid({
@@ -94,16 +95,16 @@ export function HeatmapGrid({
           {sortedDates.map((date) => (
             <div
               key={date.toISOString()}
-              className="h-16 flex flex-col items-center justify-center text-xs font-medium border-b border-neutral-200"
+              className="h-16 flex flex-col items-center justify-center text-xs font-bold border-b-2 border-black"
             >
-              <span className="text-neutral-500">{format(date, "EEE")}</span>
+              <span className="text-neutral-600">{format(date, "EEE")}</span>
               <span>{format(date, "MMM d")}</span>
             </div>
           ))}
 
           {timeLabels.map((label, rowIndex) => (
             <React.Fragment key={label}>
-              <div className="h-6 flex items-center justify-end pr-2 text-xs text-neutral-500">
+              <div className="h-6 flex items-center justify-end pr-2 text-xs font-medium text-neutral-600">
                 {label}
               </div>
               {sortedDates.map((date) => {
@@ -121,9 +122,9 @@ export function HeatmapGrid({
                   <div
                     key={cellId}
                     className={cn(
-                      "h-6 border border-neutral-200 cursor-pointer transition-all",
+                      "h-6 border-2 border-black cursor-pointer transition-all",
                       colorClass,
-                      hoveredSlot === cellId && "ring-2 ring-neutral-900 ring-inset"
+                      hoveredSlot === cellId && "ring-2 ring-[#FFE500] ring-offset-1"
                     )}
                     onMouseEnter={(e) => handleMouseEnter(e, cellId)}
                     onMouseMove={handleMouseMove}
@@ -138,13 +139,13 @@ export function HeatmapGrid({
 
       {hoveredSlot && hoveredData && (
         <div
-          className="fixed z-50 bg-white border border-neutral-200 rounded-lg shadow-lg p-3 text-sm pointer-events-none"
+          className="fixed z-50 bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_#000] p-3 text-sm pointer-events-none"
           style={{
             left: tooltipPosition.x + 10,
             top: tooltipPosition.y + 10,
           }}
         >
-          <div className="font-medium mb-1">
+          <div className="font-bold mb-1">
             {hoveredData.count} / {totalParticipants} available
           </div>
           {hoveredData.participants.length > 0 && (
@@ -157,15 +158,15 @@ export function HeatmapGrid({
         </div>
       )}
 
-      <div className="mt-4 flex items-center gap-2 text-xs text-neutral-600">
+      <div className="mt-4 flex items-center gap-2 text-xs font-medium text-black">
         <span>Fewer</span>
         <div className="flex gap-0.5">
-          <div className="w-4 h-4 bg-white border border-neutral-200 rounded-sm" />
-          <div className="w-4 h-4 bg-emerald-200 border border-neutral-200 rounded-sm" />
-          <div className="w-4 h-4 bg-emerald-300 border border-neutral-200 rounded-sm" />
-          <div className="w-4 h-4 bg-emerald-400 border border-neutral-200 rounded-sm" />
-          <div className="w-4 h-4 bg-emerald-500 border border-neutral-200 rounded-sm" />
-          <div className="w-4 h-4 bg-emerald-600 border border-neutral-200 rounded-sm" />
+          <div className="w-4 h-4 bg-white border-2 border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#99f6e4] border-2 border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#5eead4] border-2 border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#2dd4bf] border-2 border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#14b8a6] border-2 border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#0d9488] border-2 border-black rounded-sm" />
         </div>
         <span>More</span>
       </div>

@@ -154,7 +154,7 @@ export function CreateEventForm() {
             selected={selectedDates}
             onSelect={handleDateSelect}
             disabled={{ before: new Date() }}
-            className="rounded-md border"
+            className="rounded-xl border-2 border-black bg-white shadow-[4px_4px_0px_0px_#000]"
           />
           {errors.dates && (
             <p className="text-sm text-red-500 mt-2">{errors.dates.message}</p>

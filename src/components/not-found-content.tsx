@@ -9,11 +9,13 @@ export function NotFoundContent() {
   const { t } = useLanguage();
 
   return (
-    <main className="min-h-screen bg-neutral-50 flex items-center justify-center">
+    <main className="min-h-screen bg-[#FFF8E7] flex items-center justify-center">
       <div className="text-center px-4">
-        <CalendarX className="h-16 w-16 mx-auto text-neutral-400 mb-6" />
-        <h1 className="text-3xl font-bold mb-2">{t.notFound.title}</h1>
-        <p className="text-neutral-600 mb-8 max-w-md">
+        <div className="h-20 w-20 bg-[#FFB347] border-2 border-black rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-[4px_4px_0px_0px_#000]">
+          <CalendarX className="h-10 w-10 text-black" />
+        </div>
+        <h1 className="text-3xl font-black mb-2 text-black">{t.notFound.title}</h1>
+        <p className="text-neutral-700 mb-8 max-w-md font-medium">
           {t.notFound.description}
         </p>
         <Button asChild>

@@ -55,7 +55,7 @@ export default async function RespondPage({ params, searchParams }: RespondPageP
   const dates = event.dates.map((d) => new Date(d.date));
 
   return (
-    <main className="min-h-screen bg-neutral-50">
+    <main className="min-h-screen bg-[#FFF8E7]">
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         <BackLink href={`/event/${eventId}`} type="event" />
 

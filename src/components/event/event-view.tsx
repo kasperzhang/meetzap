@@ -33,6 +33,11 @@ interface EventViewProps {
 
 export function EventView({ event }: EventViewProps) {
   const { t } = useLanguage();
+  const [shareUrl, setShareUrl] = React.useState(`/event/${event.id}/respond`);
+
+  React.useEffect(() => {
+    setShareUrl(`${window.location.origin}/event/${event.id}/respond`);
+  }, [event.id]);
 
   const dates = React.useMemo(
     () => event.dates.map((d) => new Date(d.date)),
@@ -202,9 +207,7 @@ export function EventView({ event }: EventViewProps) {
           </div>
           <div className="mt-2 flex gap-2">
             <code className="flex-1 px-3 py-2 bg-neutral-100 rounded-md text-sm overflow-x-auto">
-              {typeof window !== "undefined"
-                ? `${window.location.origin}/event/${event.id}/respond`
-                : `/event/${event.id}/respond`}
+              {shareUrl}
             </code>
             <Button variant="outline" size="sm" onClick={copyShareLink}>
               {t.eventView.copy}

@@ -39,7 +39,7 @@ export default async function EventPage({ params }: EventPageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-neutral-50">
+    <main className="min-h-screen bg-[#FFF8E7]">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <BackLink href="/" type="home" />
 

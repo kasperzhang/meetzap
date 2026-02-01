@@ -183,7 +183,7 @@ export function EventView({ event }: EventViewProps) {
               </ul>
             )}
 
-            <div className="mt-6 pt-4 border-t">
+            <div className="mt-6">
               <Button asChild className="w-full">
                 <Link href={`/event/${event.id}/respond`}>
                   {t.eventView.addYourAvailability}

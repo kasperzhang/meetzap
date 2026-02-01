@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Users, Clock, Share2 } from "lucide-react";
+import { Calendar, Users, Clock, Share2, Info } from "lucide-react";
 import { useLanguage } from "@/i18n";
 
 export default function HomePage() {
@@ -132,6 +132,20 @@ export default function HomePage() {
               </div>
             </li>
           </ol>
+        </div>
+      </div>
+
+      {/* Privacy Info Icon */}
+      <div className="fixed bottom-6 right-6 group">
+        <div className="h-10 w-10 bg-white border-2 border-black rounded-full flex items-center justify-center shadow-[3px_3px_0px_0px_#000] cursor-help hover:bg-[#4ECDC4] transition-colors">
+          <Info className="h-5 w-5 text-black" />
+        </div>
+        <div className="absolute bottom-14 right-0 w-72 p-3 bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_#000] text-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+          <p className="font-bold mb-1">Privacy Notice</p>
+          <p className="text-neutral-600">
+            This tool does not require login and does not collect personal data.
+            All availability data is stored temporarily for scheduling purposes only.
+          </p>
         </div>
       </div>
     </main>

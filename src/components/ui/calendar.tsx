@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { DayPicker } from "react-day-picker";
+import { DayPicker, useDayPicker } from "react-day-picker";
 import { zhCN, enUS } from "date-fns/locale";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -9,6 +9,39 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/i18n";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+
+// Custom caption component that includes both month label and nav buttons
+function CustomCaption({ calendarMonth }: { calendarMonth: { date: Date } }) {
+  const { goToMonth, nextMonth, previousMonth } = useDayPicker();
+  const { locale } = useLanguage();
+  const dateLocale = locale === "zh" ? zhCN : enUS;
+
+  return (
+    <div className="flex items-center justify-between mb-4">
+      <div className="text-lg font-black">
+        {format(calendarMonth.date, "MMMM yyyy", { locale: dateLocale })}
+      </div>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => previousMonth && goToMonth(previousMonth)}
+          disabled={!previousMonth}
+          className="h-9 w-9 bg-[#FFE500] p-0 inline-flex items-center justify-center rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_#000] transition-all disabled:opacity-50"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => nextMonth && goToMonth(nextMonth)}
+          disabled={!nextMonth}
+          className="h-9 w-9 bg-[#FFE500] p-0 inline-flex items-center justify-center rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_#000] transition-all disabled:opacity-50"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function Calendar({
   className,
@@ -23,17 +56,12 @@ function Calendar({
     <DayPicker
       showOutsideDays={showOutsideDays}
       locale={dateLocale}
+      hideNavigation
       className={cn("p-6 w-full", className)}
       classNames={{
         months: "flex flex-col space-y-4 w-full",
         month: "space-y-4 w-full",
-        month_caption: "flex items-center justify-between mb-4",
-        caption_label: "text-lg font-black",
-        nav: "flex items-center gap-2",
-        button_previous:
-          "h-9 w-9 bg-[#FFE500] p-0 inline-flex items-center justify-center rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_#000] transition-all",
-        button_next:
-          "h-9 w-9 bg-[#FFE500] p-0 inline-flex items-center justify-center rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_#000] transition-all",
+        month_caption: "hidden",
         month_grid: "w-full",
         weekdays: "grid grid-cols-7 w-full mb-2",
         weekday: "text-black font-black text-sm py-2 text-center",
@@ -55,19 +83,7 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        Chevron: ({ orientation }) =>
-          orientation === "left" ? (
-            <ChevronLeft className="h-5 w-5" />
-          ) : (
-            <ChevronRight className="h-5 w-5" />
-          ),
-        MonthCaption: ({ calendarMonth, displayIndex }) => {
-          return (
-            <div className="text-lg font-black">
-              {format(calendarMonth.date, "MMMM yyyy", { locale: dateLocale })}
-            </div>
-          );
-        },
+        MonthCaption: CustomCaption,
       }}
       {...props}
     />

@@ -63,31 +63,6 @@ body {
   --rdp-accent-background-color: #FFE500;
 }
 
-/* Make month a flex container to rearrange caption and nav */
-.rdp-month {
-  display: flex !important;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.rdp-month_caption {
-  order: 1;
-  display: flex;
-  align-items: center;
-}
-
-.rdp-nav {
-  order: 2;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-left: auto;
-}
-
-.rdp-month_grid {
-  order: 3;
-  width: 100%;
-}
 
 /* Ensure day buttons are properly centered */
 .rdp-day_button {

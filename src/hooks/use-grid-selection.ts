@@ -12,10 +12,11 @@ interface GridSelectionState {
 interface UseGridSelectionOptions {
   initialSelection?: Set<string>;
   onSelectionChange?: (selection: Set<string>) => void;
+  tapToToggle?: boolean; // Mobile mode: tap to toggle instead of drag
 }
 
 export function useGridSelection(options: UseGridSelectionOptions = {}) {
-  const { initialSelection = new Set(), onSelectionChange } = options;
+  const { initialSelection = new Set(), onSelectionChange, tapToToggle = false } = options;
 
   const [selectedCells, setSelectedCells] = useState<Set<string>>(initialSelection);
   const [state, setState] = useState<GridSelectionState>({
@@ -62,8 +63,27 @@ export function useGridSelection(options: UseGridSelectionOptions = {}) {
     []
   );
 
+  const handleTap = useCallback(
+    (cellId: string) => {
+      const newSelection = new Set(selectedCells);
+      if (newSelection.has(cellId)) {
+        newSelection.delete(cellId);
+      } else {
+        newSelection.add(cellId);
+      }
+      setSelectedCells(newSelection);
+      onSelectionChange?.(newSelection);
+    },
+    [selectedCells, onSelectionChange]
+  );
+
   const handleMouseDown = useCallback(
     (cellId: string) => {
+      if (tapToToggle) {
+        handleTap(cellId);
+        return;
+      }
+
       const isCurrentlySelected = selectedCells.has(cellId);
       const mode = isCurrentlySelected ? "deselect" : "select";
 
@@ -76,7 +96,7 @@ export function useGridSelection(options: UseGridSelectionOptions = {}) {
 
       pendingSelection.current = new Set([cellId]);
     },
-    [selectedCells]
+    [selectedCells, tapToToggle, handleTap]
   );
 
   const handleMouseEnter = useCallback(
@@ -119,14 +139,21 @@ export function useGridSelection(options: UseGridSelectionOptions = {}) {
 
   const handleTouchStart = useCallback(
     (cellId: string, e: React.TouchEvent) => {
+      if (tapToToggle) {
+        // In tap mode, just toggle the cell and allow normal page scrolling
+        handleTap(cellId);
+        return;
+      }
       e.preventDefault();
       handleMouseDown(cellId);
     },
-    [handleMouseDown]
+    [handleMouseDown, tapToToggle, handleTap]
   );
 
   const handleTouchMove = useCallback(
     (e: React.TouchEvent, allCellIds: string[]) => {
+      // In tap mode, don't do drag selection - allow normal scrolling
+      if (tapToToggle) return;
       if (!state.isSelecting) return;
 
       e.preventDefault();
@@ -144,12 +171,13 @@ export function useGridSelection(options: UseGridSelectionOptions = {}) {
         }
       }
     },
-    [state.isSelecting, handleMouseEnter]
+    [state.isSelecting, handleMouseEnter, tapToToggle]
   );
 
   const handleTouchEnd = useCallback(() => {
+    if (tapToToggle) return; // No-op in tap mode
     handleMouseUp();
-  }, [handleMouseUp]);
+  }, [handleMouseUp, tapToToggle]);
 
   const isCellInPendingSelection = useCallback(
     (cellId: string): boolean => {

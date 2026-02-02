@@ -7,6 +7,22 @@ import { GridCell } from "./grid-cell";
 import { generateTimeSlots, getSlotKey, generateTimeLabels } from "@/lib/utils/grid";
 import type { TimeSlot } from "@/types";
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.matchMedia("(max-width: 768px)").matches);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  return isMobile;
+}
+
 interface AvailabilityGridProps {
   dates: Date[];
   startTime: string;
@@ -26,6 +42,8 @@ export function AvailabilityGrid({
   onSelectionChange,
   readOnly = false,
 }: AvailabilityGridProps) {
+  const isMobile = useIsMobile();
+
   const slots = React.useMemo(
     () => generateTimeSlots(dates, startTime, endTime, slotDurationMinutes),
     [dates, startTime, endTime, slotDurationMinutes]
@@ -65,6 +83,7 @@ export function AvailabilityGrid({
   } = useGridSelection({
     initialSelection,
     onSelectionChange,
+    tapToToggle: isMobile,
   });
 
   React.useEffect(() => {

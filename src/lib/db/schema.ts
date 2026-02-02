@@ -7,6 +7,7 @@ export const events = pgTable("events", {
   description: text("description"),
   timezone: text("timezone").notNull().default("UTC"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  expiresAt: timestamp("expires_at"),
 });
 
 export const eventDates = pgTable(

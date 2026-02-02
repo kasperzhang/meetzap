@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, lt } from "drizzle-orm";
 import { db } from ".";
 import {
   events,
@@ -16,11 +16,16 @@ import type {
 export async function createEvent(input: CreateEventInput) {
   const eventId = nanoid(10);
 
+  // Calculate expiration: 30 days after the last selected date
+  const lastDate = new Date(Math.max(...input.dates.map(d => new Date(d).getTime())));
+  const expiresAt = new Date(lastDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+
   await db.insert(events).values({
     id: eventId,
     title: input.title,
     description: input.description,
     timezone: input.timezone,
+    expiresAt,
   });
 
   await db.insert(eventDates).values(
@@ -152,4 +157,13 @@ export async function getAggregatedAvailability(eventId: string) {
       count: names.length,
     })),
   };
+}
+
+export async function deleteExpiredEvents() {
+  const result = await db
+    .delete(events)
+    .where(lt(events.expiresAt, new Date()))
+    .returning({ id: events.id });
+
+  return result.length;
 }

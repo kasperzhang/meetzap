@@ -1,7 +1,7 @@
-import { notFound } from "next/navigation";
 import { getEvent, getParticipant } from "@/lib/db/queries";
 import { ParticipantForm } from "@/components/event/participant-form";
 import { BackLink } from "@/components/back-link";
+import Link from "next/link";
 
 interface RespondPageProps {
   params: Promise<{ eventId: string }>;
@@ -14,6 +14,10 @@ export async function generateMetadata({ params }: RespondPageProps) {
   try {
     const event = await getEvent(eventId);
     if (!event) return { title: "Event Not Found" };
+
+    if (event.expiresAt && new Date(event.expiresAt) < new Date()) {
+      return { title: "Event Expired - MeetZap" };
+    }
 
     return {
       title: `Respond - ${event.title} - MeetZap`,
@@ -33,11 +37,30 @@ export default async function RespondPage({ params, searchParams }: RespondPageP
     event = await getEvent(eventId);
   } catch (error) {
     console.error("Error fetching event:", error);
-    notFound();
   }
 
-  if (!event || !event.timeConfig) {
-    notFound();
+  // Show expired message if event not found or expired
+  if (!event || !event.timeConfig || (event.expiresAt && new Date(event.expiresAt) < new Date())) {
+    return (
+      <main className="min-h-screen bg-[#FFF8E7]">
+        <div className="container mx-auto px-4 py-8 max-w-3xl">
+          <div className="text-center py-16">
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">
+              Event Has Expired
+            </h1>
+            <p className="text-gray-600 mb-8">
+              This event is no longer available. Events expire 30 days after the last scheduled date.
+            </p>
+            <Link
+              href="/"
+              className="inline-block bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors"
+            >
+              Create a New Event
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
   }
 
   let existingParticipant;

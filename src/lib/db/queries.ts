@@ -16,27 +16,25 @@ import type {
 export async function createEvent(input: CreateEventInput) {
   const eventId = nanoid(10);
 
-  await db.transaction(async (tx) => {
-    await tx.insert(events).values({
-      id: eventId,
-      title: input.title,
-      description: input.description,
-      timezone: input.timezone,
-    });
+  await db.insert(events).values({
+    id: eventId,
+    title: input.title,
+    description: input.description,
+    timezone: input.timezone,
+  });
 
-    await tx.insert(eventDates).values(
-      input.dates.map((date) => ({
-        eventId,
-        date,
-      }))
-    );
-
-    await tx.insert(eventTimeConfig).values({
+  await db.insert(eventDates).values(
+    input.dates.map((date) => ({
       eventId,
-      startTime: input.startTime,
-      endTime: input.endTime,
-      slotDurationMinutes: input.slotDurationMinutes,
-    });
+      date,
+    }))
+  );
+
+  await db.insert(eventTimeConfig).values({
+    eventId,
+    startTime: input.startTime,
+    endTime: input.endTime,
+    slotDurationMinutes: input.slotDurationMinutes,
   });
 
   return eventId;
@@ -61,24 +59,22 @@ export async function createParticipant(
 ) {
   const participantId = nanoid(10);
 
-  await db.transaction(async (tx) => {
-    await tx.insert(participants).values({
-      id: participantId,
-      eventId,
-      name: input.name,
-    });
-
-    if (input.availability.length > 0) {
-      await tx.insert(availability).values(
-        input.availability.map((slot) => ({
-          participantId,
-          eventId,
-          slotStart: new Date(slot.slotStart),
-          slotEnd: new Date(slot.slotEnd),
-        }))
-      );
-    }
+  await db.insert(participants).values({
+    id: participantId,
+    eventId,
+    name: input.name,
   });
+
+  if (input.availability.length > 0) {
+    await db.insert(availability).values(
+      input.availability.map((slot) => ({
+        participantId,
+        eventId,
+        slotStart: new Date(slot.slotStart),
+        slotEnd: new Date(slot.slotEnd),
+      }))
+    );
+  }
 
   return participantId;
 }
@@ -97,22 +93,20 @@ export async function updateParticipantAvailability(
   eventId: string,
   slots: { slotStart: string; slotEnd: string }[]
 ) {
-  await db.transaction(async (tx) => {
-    await tx
-      .delete(availability)
-      .where(eq(availability.participantId, participantId));
+  await db
+    .delete(availability)
+    .where(eq(availability.participantId, participantId));
 
-    if (slots.length > 0) {
-      await tx.insert(availability).values(
-        slots.map((slot) => ({
-          participantId,
-          eventId,
-          slotStart: new Date(slot.slotStart),
-          slotEnd: new Date(slot.slotEnd),
-        }))
-      );
-    }
-  });
+  if (slots.length > 0) {
+    await db.insert(availability).values(
+      slots.map((slot) => ({
+        participantId,
+        eventId,
+        slotStart: new Date(slot.slotStart),
+        slotEnd: new Date(slot.slotEnd),
+      }))
+    );
+  }
 }
 
 export async function getEventAvailability(eventId: string) {

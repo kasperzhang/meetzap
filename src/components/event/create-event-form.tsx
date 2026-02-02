@@ -17,20 +17,22 @@ import { createEventSchema, type CreateEventInput } from "@/lib/validations/even
 import { useLanguage, interpolate } from "@/i18n";
 
 const TIMEZONES = [
-  "America/New_York",
-  "America/Chicago",
-  "America/Denver",
-  "America/Los_Angeles",
-  "America/Anchorage",
-  "Pacific/Honolulu",
-  "Europe/London",
-  "Europe/Paris",
-  "Europe/Berlin",
-  "Asia/Tokyo",
-  "Asia/Shanghai",
-  "Asia/Singapore",
-  "Australia/Sydney",
-  "UTC",
+  { value: "America/Toronto", label: "Canada/Toronto" },
+  { value: "America/Vancouver", label: "Canada/Vancouver" },
+  { value: "America/New_York", label: "America/New_York" },
+  { value: "America/Chicago", label: "America/Chicago" },
+  { value: "America/Denver", label: "America/Denver" },
+  { value: "America/Los_Angeles", label: "America/Los_Angeles" },
+  { value: "America/Anchorage", label: "America/Anchorage" },
+  { value: "Pacific/Honolulu", label: "Pacific/Honolulu" },
+  { value: "Europe/London", label: "Europe/London" },
+  { value: "Europe/Paris", label: "Europe/Paris" },
+  { value: "Europe/Berlin", label: "Europe/Berlin" },
+  { value: "Asia/Tokyo", label: "Asia/Tokyo" },
+  { value: "Asia/Shanghai", label: "Asia/Shanghai" },
+  { value: "Asia/Singapore", label: "Asia/Singapore" },
+  { value: "Australia/Sydney", label: "Australia/Sydney" },
+  { value: "UTC", label: "UTC" },
 ];
 
 export function CreateEventForm() {
@@ -56,7 +58,7 @@ export function CreateEventForm() {
     defaultValues: {
       title: "",
       description: "",
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      timezone: "America/Toronto",
       dates: [],
       startTime: "09:00",
       endTime: "17:00",
@@ -135,8 +137,8 @@ export function CreateEventForm() {
             <Label htmlFor="timezone">{t.createEvent.timezone}</Label>
             <Select {...register("timezone")}>
               {TIMEZONES.map((tz) => (
-                <option key={tz} value={tz}>
-                  {tz}
+                <option key={tz.value} value={tz.value}>
+                  {tz.label}
                 </option>
               ))}
             </Select>

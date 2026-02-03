@@ -28,6 +28,7 @@ export function useGridSelection(options: UseGridSelectionOptions = {}) {
 
   const pendingSelection = useRef<Set<string>>(new Set());
   const cellRefs = useRef<Map<string, DOMRect>>(new Map());
+  const lastTouchTime = useRef<number>(0);
 
   const registerCell = useCallback((cellId: string, rect: DOMRect) => {
     cellRefs.current.set(cellId, rect);
@@ -79,6 +80,11 @@ export function useGridSelection(options: UseGridSelectionOptions = {}) {
 
   const handleMouseDown = useCallback(
     (cellId: string) => {
+      // Ignore synthetic mouse events that follow touch events
+      if (Date.now() - lastTouchTime.current < 500) {
+        return;
+      }
+
       if (tapToToggle) {
         handleTap(cellId);
         return;
@@ -139,6 +145,8 @@ export function useGridSelection(options: UseGridSelectionOptions = {}) {
 
   const handleTouchStart = useCallback(
     (cellId: string, e: React.TouchEvent) => {
+      lastTouchTime.current = Date.now();
+
       if (tapToToggle) {
         // In tap mode, just toggle the cell and allow normal page scrolling
         handleTap(cellId);

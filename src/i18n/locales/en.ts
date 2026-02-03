@@ -122,6 +122,10 @@ export interface Translations {
   common: {
     loading: string;
   };
+  privacy: {
+    title: string;
+    description: string;
+  };
 }
 
 export const en: Translations = {
@@ -247,5 +251,9 @@ export const en: Translations = {
   },
   common: {
     loading: "Loading...",
+  },
+  privacy: {
+    title: "Privacy Notice",
+    description: "This tool does not require login and does not collect personal data. All availability data is stored temporarily for scheduling purposes only.",
   },
 };

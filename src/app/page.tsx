@@ -141,10 +141,9 @@ export default function HomePage() {
           <Info className="h-5 w-5 text-black" />
         </div>
         <div className="absolute bottom-14 right-0 w-72 p-3 bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_#000] text-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-          <p className="font-bold mb-1">Privacy Notice</p>
+          <p className="font-bold mb-1">{t.privacy.title}</p>
           <p className="text-neutral-600">
-            This tool does not require login and does not collect personal data.
-            All availability data is stored temporarily for scheduling purposes only.
+            {t.privacy.description}
           </p>
         </div>
       </div>

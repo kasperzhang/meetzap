@@ -124,4 +124,8 @@ export const zh: Translations = {
   common: {
     loading: "加载中...",
   },
+  privacy: {
+    title: "隐私声明",
+    description: "本工具无需登录，不收集个人数据。所有空闲时间数据仅临时存储用于日程安排。",
+  },
 };

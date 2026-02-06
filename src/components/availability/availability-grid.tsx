@@ -143,7 +143,7 @@ export function AvailabilityGrid({
                 return (
                   <div
                     key={cellId}
-                    className={`h-6 border border-neutral-200 ${
+                    className={`h-6 border border-neutral-200 -ml-px -mt-px ${
                       isSelected ? "bg-emerald-500" : "bg-white"
                     }`}
                   />

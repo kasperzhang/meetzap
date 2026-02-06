@@ -43,7 +43,7 @@ export const GridCell = React.memo(function GridCell({
     <div
       ref={ref}
       className={cn(
-        "h-6 border-2 border-black cursor-pointer transition-all select-none",
+        "h-6 border border-black cursor-pointer transition-all select-none -ml-px -mt-px",
         state === "selected" && "bg-[#A8E6CF]",
         state === "pending-select" && "bg-[#A8E6CF]/60",
         state === "pending-deselect" && "bg-[#FF6B6B]/60",

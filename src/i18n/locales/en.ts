@@ -125,6 +125,15 @@ export interface Translations {
   privacy: {
     title: string;
     description: string;
+    lastUpdated: string;
+    backToHome: string;
+  };
+  footer: {
+    slogan: string;
+    privacyPolicy: string;
+    madeBy: string;
+    madeByEnd: string;
+    copyright: string;
   };
 }
 
@@ -253,7 +262,16 @@ export const en: Translations = {
     loading: "Loading...",
   },
   privacy: {
-    title: "Privacy Notice",
+    title: "Privacy Policy",
     description: "This tool does not require login and does not collect personal data. All availability data is stored temporarily for scheduling purposes only.",
+    lastUpdated: "Last updated: February 7, 2025",
+    backToHome: "Back to Home",
+  },
+  footer: {
+    slogan: "The easiest free scheduling tool for everyone.",
+    privacyPolicy: "Privacy Policy",
+    madeBy: "Made by ",
+    madeByEnd: "",
+    copyright: "© 2025 MeetZap",
   },
 };

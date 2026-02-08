@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Users, Clock, Share2, Info } from "lucide-react";
+import { Calendar, Users, Clock, Share2, Zap } from "lucide-react";
 import { useLanguage } from "@/i18n";
 
 export default function HomePage() {
@@ -135,18 +135,36 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Privacy Info Icon */}
-      <div className="fixed bottom-6 right-6 group">
-        <div className="h-10 w-10 bg-white border-2 border-black rounded-full flex items-center justify-center shadow-[3px_3px_0px_0px_#000] cursor-help hover:bg-[#4ECDC4] transition-colors">
-          <Info className="h-5 w-5 text-black" />
+      {/* Footer */}
+      <footer className="mt-16">
+        <div className="px-6 pt-16 pb-5 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <Zap className="h-4 w-4 text-neutral-400" />
+              <span className="text-sm font-black tracking-tight text-neutral-400">MeetZap</span>
+            </div>
+            <span className="text-xs text-neutral-400">{t.footer.slogan}</span>
+          </div>
+          <div className="flex items-center gap-4 text-xs text-neutral-400">
+            <Link href="/privacy" className="hover:text-black transition-colors">
+              {t.footer.privacyPolicy}
+            </Link>
+            <span>
+              {t.footer.madeBy}
+              <a
+                href="https://x.com/thekasperzhang"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-neutral-500 hover:text-black transition-colors"
+              >
+                @kasperzhang
+              </a>
+              {t.footer.madeByEnd}
+            </span>
+            <span>{t.footer.copyright}</span>
+          </div>
         </div>
-        <div className="absolute bottom-14 right-0 w-72 p-3 bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_#000] text-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-          <p className="font-bold mb-1">{t.privacy.title}</p>
-          <p className="text-neutral-600">
-            {t.privacy.description}
-          </p>
-        </div>
-      </div>
+      </footer>
     </main>
   );
 }

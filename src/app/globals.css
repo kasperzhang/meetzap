@@ -99,3 +99,55 @@ body {
 .neo-transition {
   transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
 }
+
+/* Privacy policy content styles */
+.policy-content h2 {
+  font-size: 1.25rem;
+  font-weight: 900;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.policy-content h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.policy-content h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.policy-content p {
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: #525252;
+  margin-bottom: 0.75rem;
+}
+
+.policy-content ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.policy-content li {
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: #525252;
+  margin-bottom: 0.25rem;
+}
+
+.policy-content a {
+  font-weight: 700;
+  color: #000;
+  text-decoration: underline;
+}
+
+.policy-content a:hover {
+  color: #525252;
+}

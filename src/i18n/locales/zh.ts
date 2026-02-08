@@ -125,7 +125,16 @@ export const zh: Translations = {
     loading: "加载中...",
   },
   privacy: {
-    title: "隐私声明",
+    title: "隐私政策",
     description: "本工具无需登录，不收集个人数据。所有空闲时间数据仅临时存储用于日程安排。",
+    lastUpdated: "最后更新：2025年2月7日",
+    backToHome: "返回首页",
+  },
+  footer: {
+    slogan: "最简单的免费日程协调工具，人人可用。",
+    privacyPolicy: "隐私政策",
+    madeBy: "由 ",
+    madeByEnd: " 制作",
+    copyright: "© 2025 MeetZap",
   },
 };

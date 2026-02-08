@@ -137,4 +137,15 @@ export const zh: Translations = {
     madeByEnd: " 制作",
     copyright: "© 2025 MeetZap",
   },
+  nav: {
+    blog: "博客",
+  },
+  blog: {
+    title: "博客",
+    subtitle: "关于日程协调和 MeetZap 的技巧、指南和更新。",
+    readMore: "阅读更多",
+    backToBlog: "返回博客",
+    backToHome: "返回首页",
+    minRead: "分钟阅读",
+  },
 };

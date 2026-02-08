@@ -3,8 +3,11 @@
 import Link from "next/link";
 import { LanguageSwitch } from "./language-switch";
 import { Zap } from "lucide-react";
+import { useLanguage } from "@/i18n";
 
 export function Header() {
+  const { t } = useLanguage();
+
   return (
     <header className="w-full pt-4">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -16,7 +19,15 @@ export function Header() {
             Meet<span className="text-[#FF6B6B]">Zap</span>
           </span>
         </Link>
-        <LanguageSwitch />
+        <div className="flex items-center gap-4">
+          <Link
+            href="/blog"
+            className="text-sm font-bold text-black hover:text-neutral-600 transition-colors"
+          >
+            {t.nav.blog}
+          </Link>
+          <LanguageSwitch />
+        </div>
       </div>
     </header>
   );

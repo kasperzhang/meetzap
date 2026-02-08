@@ -135,6 +135,17 @@ export interface Translations {
     madeByEnd: string;
     copyright: string;
   };
+  nav: {
+    blog: string;
+  };
+  blog: {
+    title: string;
+    subtitle: string;
+    readMore: string;
+    backToBlog: string;
+    backToHome: string;
+    minRead: string;
+  };
 }
 
 export const en: Translations = {
@@ -273,5 +284,16 @@ export const en: Translations = {
     madeBy: "Made by ",
     madeByEnd: "",
     copyright: "© 2025 MeetZap",
+  },
+  nav: {
+    blog: "Blog",
+  },
+  blog: {
+    title: "Blog",
+    subtitle: "Tips, guides, and updates about scheduling and MeetZap.",
+    readMore: "Read more",
+    backToBlog: "Back to Blog",
+    backToHome: "Back to Home",
+    minRead: "min read",
   },
 };

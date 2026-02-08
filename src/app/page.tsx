@@ -9,8 +9,32 @@ import { useLanguage } from "@/i18n";
 export default function HomePage() {
   const { t } = useLanguage();
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "MeetZap",
+    url: "https://meetzap.app",
+    description: "The easiest free scheduling tool for everyone. Create events, share links, and find the best meeting times with an interactive availability grid.",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Any",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+    author: {
+      "@type": "Person",
+      name: "kasperzhang",
+      url: "https://x.com/kasperzhang",
+    },
+  };
+
   return (
     <main className="min-h-screen bg-[#FFF8E7]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-black tracking-tight mb-4 text-black">

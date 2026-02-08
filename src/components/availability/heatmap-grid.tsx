@@ -95,16 +95,16 @@ export function HeatmapGrid({
           {sortedDates.map((date) => (
             <div
               key={date.toISOString()}
-              className="h-16 flex flex-col items-center justify-center text-xs font-bold border-b-2 border-black"
+              className="h-16 flex flex-col items-center justify-center text-xs font-medium border-b black"
             >
-              <span className="text-neutral-600">{format(date, "EEE")}</span>
+              <span className="text-neutral-500">{format(date, "EEE")}</span>
               <span>{format(date, "MMM d")}</span>
             </div>
           ))}
 
           {timeLabels.map((label, rowIndex) => (
             <React.Fragment key={label}>
-              <div className="h-6 flex items-center justify-end pr-2 text-xs font-medium text-neutral-600">
+              <div className="h-6 flex items-start justify-end pr-2 text-xs text-neutral-500 -translate-y-[30%]">
                 {label}
               </div>
               {sortedDates.map((date) => {
@@ -122,7 +122,7 @@ export function HeatmapGrid({
                   <div
                     key={cellId}
                     className={cn(
-                      "h-6 border-2 border-black cursor-pointer transition-all",
+                      "h-6 border black -ml-px -mt-px cursor-pointer transition-all",
                       colorClass,
                       hoveredSlot === cellId && "ring-2 ring-[#FFE500] ring-offset-1"
                     )}
@@ -161,12 +161,12 @@ export function HeatmapGrid({
       <div className="mt-4 flex items-center gap-2 text-xs font-medium text-black">
         <span>Fewer</span>
         <div className="flex gap-0.5">
-          <div className="w-4 h-4 bg-white border-2 border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#99f6e4] border-2 border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#5eead4] border-2 border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#2dd4bf] border-2 border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#14b8a6] border-2 border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#0d9488] border-2 border-black rounded-sm" />
+          <div className="w-4 h-4 bg-white border black rounded-sm" />
+          <div className="w-4 h-4 bg-[#99f6e4] border black rounded-sm" />
+          <div className="w-4 h-4 bg-[#5eead4] border black rounded-sm" />
+          <div className="w-4 h-4 bg-[#2dd4bf] border black rounded-sm" />
+          <div className="w-4 h-4 bg-[#14b8a6] border black rounded-sm" />
+          <div className="w-4 h-4 bg-[#0d9488] border black rounded-sm" />
         </div>
         <span>More</span>
       </div>

@@ -128,7 +128,7 @@ export function AvailabilityGrid({
 
           {timeLabels.map((label, rowIndex) => (
             <React.Fragment key={label}>
-              <div className="h-6 flex items-center justify-end pr-2 text-xs text-neutral-500">
+              <div className="h-6 flex items-start justify-end pr-2 text-xs text-neutral-500 -translate-y-[30%]">
                 {label}
               </div>
               {sortedDates.map((date) => {
@@ -180,7 +180,7 @@ export function AvailabilityGrid({
 
         {timeLabels.map((label, rowIndex) => (
           <React.Fragment key={label}>
-            <div className="h-6 flex items-center justify-end pr-2 text-xs text-neutral-500">
+            <div className="h-6 flex items-start justify-end pr-2 text-xs text-neutral-500 -translate-y-[30%]">
               {label}
             </div>
             {sortedDates.map((date) => {

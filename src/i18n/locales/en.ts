@@ -81,6 +81,16 @@ export interface Translations {
     edit: string;
     shareThisLink: string;
     copy: string;
+    scheduleMeeting: string;
+    meetingTitle: string;
+    meetingDescription: string;
+    scheduleWarning: string;
+    confirmSchedule: string;
+    cancel: string;
+    meetingScheduled: string;
+    scheduledFor: string;
+    selectSlotsToSchedule: string;
+    selectSlotsHint: string;
   };
   participantForm: {
     backToEvent: string;
@@ -231,6 +241,16 @@ export const en: Translations = {
     edit: "Edit",
     shareThisLink: "Share this link to collect availability:",
     copy: "Copy",
+    scheduleMeeting: "Schedule Meeting",
+    meetingTitle: "Meeting Title",
+    meetingDescription: "Description (optional)",
+    scheduleWarning: "Please make sure all participants have filled in their availability. Once scheduled, the meeting time cannot be changed.",
+    confirmSchedule: "Confirm Schedule",
+    cancel: "Cancel",
+    meetingScheduled: "Meeting Scheduled",
+    scheduledFor: "Scheduled for",
+    selectSlotsToSchedule: "Drag to select time slots to schedule",
+    selectSlotsHint: "Select time slots on the heatmap first",
   },
   participantForm: {
     backToEvent: "Back to Event",

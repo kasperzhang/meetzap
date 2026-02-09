@@ -55,6 +55,14 @@ export interface EventWithDetails extends Event {
   participants: Participant[];
 }
 
+export interface ScheduledMeeting {
+  eventId: string;
+  title: string;
+  description: string | null;
+  slots: { slotStart: string; slotEnd: string }[];
+  scheduledAt: Date;
+}
+
 export interface CreateEventInput {
   title: string;
   description?: string;

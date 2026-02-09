@@ -63,6 +63,26 @@ export const updateAvailabilitySchema = z.object({
   ),
 });
 
+export const scheduleMeetingSchema = z.object({
+  title: z
+    .string()
+    .min(1, "Title is required")
+    .max(100, "Title must be less than 100 characters"),
+  description: z
+    .string()
+    .max(500, "Description must be less than 500 characters")
+    .optional(),
+  slots: z
+    .array(
+      z.object({
+        slotStart: z.string(),
+        slotEnd: z.string(),
+      })
+    )
+    .min(1, "At least one slot is required"),
+});
+
+export type ScheduleMeetingInput = z.infer<typeof scheduleMeetingSchema>;
 export type CreateEventInput = z.infer<typeof createEventSchema>;
 export type CreateParticipantInput = z.infer<typeof createParticipantSchema>;
 export type UpdateAvailabilityInput = z.infer<typeof updateAvailabilitySchema>;

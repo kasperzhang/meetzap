@@ -58,12 +58,23 @@ export const availability = pgTable(
   })
 );
 
+export const scheduledMeetings = pgTable("scheduled_meetings", {
+  eventId: text("event_id")
+    .primaryKey()
+    .references(() => events.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("description"),
+  slots: text("slots").notNull(), // JSON-serialized array of { slotStart, slotEnd }
+  scheduledAt: timestamp("scheduled_at").notNull().defaultNow(),
+});
+
 // Relations
 export const eventsRelations = relations(events, ({ many, one }) => ({
   dates: many(eventDates),
   timeConfig: one(eventTimeConfig),
   participants: many(participants),
   availability: many(availability),
+  scheduledMeeting: one(scheduledMeetings),
 }));
 
 export const eventDatesRelations = relations(eventDates, ({ one }) => ({
@@ -95,6 +106,13 @@ export const availabilityRelations = relations(availability, ({ one }) => ({
   }),
   event: one(events, {
     fields: [availability.eventId],
+    references: [events.id],
+  }),
+}));
+
+export const scheduledMeetingsRelations = relations(scheduledMeetings, ({ one }) => ({
+  event: one(events, {
+    fields: [scheduledMeetings.eventId],
     references: [events.id],
   }),
 }));

@@ -15,6 +15,8 @@ interface HeatmapGridProps {
   totalParticipants: number;
   highlightedParticipant?: string | null;
   excludedParticipants?: Set<string>;
+  selectable?: boolean;
+  onSlotsSelected?: (slots: string[]) => void;
 }
 
 function getHeatmapColor(count: number, maxCount: number): string {
@@ -37,9 +39,17 @@ export function HeatmapGrid({
   totalParticipants,
   highlightedParticipant,
   excludedParticipants,
+  selectable = false,
+  onSlotsSelected,
 }: HeatmapGridProps) {
   const [hoveredSlot, setHoveredSlot] = React.useState<string | null>(null);
   const [tooltipPosition, setTooltipPosition] = React.useState({ x: 0, y: 0 });
+
+  // Drag selection state
+  const [selectedSlots, setSelectedSlots] = React.useState<Set<string>>(new Set());
+  const [isSelecting, setIsSelecting] = React.useState(false);
+  const [dragStart, setDragStart] = React.useState<{ dateIdx: number; rowIdx: number } | null>(null);
+  const [dragEnd, setDragEnd] = React.useState<{ dateIdx: number; rowIdx: number } | null>(null);
 
   const slots = React.useMemo(
     () => generateTimeSlots(dates, startTime, endTime, slotDurationMinutes),
@@ -90,13 +100,75 @@ export function HeatmapGrid({
     return max;
   }, [effectiveData]);
 
+  // Compute cells in drag rectangle
+  const dragSelectedCells = React.useMemo(() => {
+    if (!selectable || !dragStart || !dragEnd) return new Set<string>();
+    const minDate = Math.min(dragStart.dateIdx, dragEnd.dateIdx);
+    const maxDate = Math.max(dragStart.dateIdx, dragEnd.dateIdx);
+    const minRow = Math.min(dragStart.rowIdx, dragEnd.rowIdx);
+    const maxRow = Math.max(dragStart.rowIdx, dragEnd.rowIdx);
+
+    const cells = new Set<string>();
+    for (let d = minDate; d <= maxDate; d++) {
+      const dateStr = format(sortedDates[d], "yyyy-MM-dd");
+      const slotsForDate = slotsByDate.get(dateStr) || [];
+      for (let r = minRow; r <= maxRow; r++) {
+        const slot = slotsForDate[r];
+        if (slot) cells.add(getSlotKey(slot));
+      }
+    }
+    return cells;
+  }, [selectable, dragStart, dragEnd, sortedDates, slotsByDate]);
+
+  // Determine if current drag would deselect (all dragged cells are already selected)
+  const isDragDeselecting = React.useMemo(() => {
+    if (dragSelectedCells.size === 0) return false;
+    return [...dragSelectedCells].every((c) => selectedSlots.has(c));
+  }, [dragSelectedCells, selectedSlots]);
+
+  const handleCellMouseDown = (e: React.MouseEvent, dateIdx: number, rowIdx: number) => {
+    if (!selectable) return;
+    e.preventDefault();
+    setIsSelecting(true);
+    setDragStart({ dateIdx, rowIdx });
+    setDragEnd({ dateIdx, rowIdx });
+  };
+
+  const handleCellMouseEnterSelection = (dateIdx: number, rowIdx: number) => {
+    if (!selectable || !isSelecting) return;
+    setDragEnd({ dateIdx, rowIdx });
+  };
+
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (!selectable || !isSelecting) return;
+    setIsSelecting(false);
+    if (dragSelectedCells.size > 0) {
+      const newSelected = new Set(selectedSlots);
+      // Toggle: if all drag cells are already selected, deselect them
+      const allAlreadySelected = [...dragSelectedCells].every((c) => selectedSlots.has(c));
+      if (allAlreadySelected) {
+        for (const c of dragSelectedCells) newSelected.delete(c);
+      } else {
+        for (const c of dragSelectedCells) newSelected.add(c);
+      }
+      setSelectedSlots(newSelected);
+      onSlotsSelected?.(Array.from(newSelected));
+    }
+    setDragStart(null);
+    setDragEnd(null);
+  };
+
   const handleMouseEnter = (e: React.MouseEvent, cellId: string) => {
-    setHoveredSlot(cellId);
-    setTooltipPosition({ x: e.clientX, y: e.clientY });
+    if (!isSelecting) {
+      setHoveredSlot(cellId);
+      setTooltipPosition({ x: e.clientX, y: e.clientY });
+    }
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    setTooltipPosition({ x: e.clientX, y: e.clientY });
+    if (!isSelecting) {
+      setTooltipPosition({ x: e.clientX, y: e.clientY });
+    }
   };
 
   const handleMouseLeave = () => {
@@ -107,7 +179,17 @@ export function HeatmapGrid({
 
   return (
     <div className="relative">
-      <div className="overflow-x-auto">
+      <div
+        className="overflow-x-auto select-none"
+        onMouseUp={handleMouseUp}
+        onMouseLeave={() => {
+          if (isSelecting) {
+            setIsSelecting(false);
+            setDragStart(null);
+            setDragEnd(null);
+          }
+        }}
+      >
         <div
           className="grid gap-0 min-w-fit"
           style={{
@@ -130,7 +212,7 @@ export function HeatmapGrid({
               <div className="h-6 flex items-start justify-end pr-2 text-xs text-neutral-500 -translate-y-[30%]">
                 {label}
               </div>
-              {sortedDates.map((date) => {
+              {sortedDates.map((date, dateIndex) => {
                 const dateStr = format(date, "yyyy-MM-dd");
                 const slotsForDate = slotsByDate.get(dateStr) || [];
                 const slot = slotsForDate[rowIndex];
@@ -145,17 +227,32 @@ export function HeatmapGrid({
                   highlightedParticipant &&
                   data?.participants.includes(highlightedParticipant);
 
+                const isSelected = selectedSlots.has(cellId);
+                const isDragSelected = dragSelectedCells.has(cellId);
+
                 return (
                   <div
                     key={cellId}
                     className={cn(
-                      "h-6 border border-black -ml-px -mt-px cursor-pointer transition-all",
-                      isHighlighted ? "bg-[#FFE500]" : colorClass,
-                      hoveredSlot === cellId && "ring-2 ring-[#FFE500] ring-offset-1"
+                      "h-6 border -ml-px -mt-px cursor-pointer transition-all",
+                      isSelected && isDragSelected && isSelecting && isDragDeselecting
+                        ? "bg-[#E0F5F0] border-[#03A48C] z-10 relative"
+                        : isSelected
+                          ? "bg-[#FFE500] border-[#D4A800] z-10 relative"
+                          : isDragSelected && isSelecting
+                            ? "bg-[#FEF3C7] border-[#D4A800] z-10 relative"
+                            : isHighlighted
+                              ? "bg-[#FFE500] border-black"
+                              : `${colorClass} border-black`,
+                      hoveredSlot === cellId && !isSelecting && !isSelected && "ring-2 ring-[#FFE500] ring-offset-1 z-10 relative"
                     )}
-                    onMouseEnter={(e) => handleMouseEnter(e, cellId)}
+                    onMouseEnter={(e) => {
+                      handleMouseEnter(e, cellId);
+                      handleCellMouseEnterSelection(dateIndex, rowIndex);
+                    }}
                     onMouseMove={handleMouseMove}
                     onMouseLeave={handleMouseLeave}
+                    onMouseDown={(e) => handleCellMouseDown(e, dateIndex, rowIndex)}
                   />
                 );
               })}
@@ -164,7 +261,7 @@ export function HeatmapGrid({
         </div>
       </div>
 
-      {hoveredSlot && hoveredData && (
+      {hoveredSlot && hoveredData && !isSelecting && (
         <div
           className="fixed z-50 bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_#000] p-3 text-sm pointer-events-none"
           style={{
@@ -196,6 +293,7 @@ export function HeatmapGrid({
         </div>
         <span>More</span>
       </div>
+
     </div>
   );
 }

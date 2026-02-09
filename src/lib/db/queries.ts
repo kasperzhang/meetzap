@@ -6,6 +6,7 @@ import {
   eventTimeConfig,
   participants,
   availability,
+  scheduledMeetings,
 } from "./schema";
 import { nanoid } from "nanoid";
 import type {
@@ -125,6 +126,7 @@ export async function getEventAvailability(eventId: string) {
           availability: true,
         },
       },
+      scheduledMeeting: true,
     },
   });
 
@@ -157,6 +159,26 @@ export async function getAggregatedAvailability(eventId: string) {
       count: names.length,
     })),
   };
+}
+
+export async function scheduleMeeting(
+  eventId: string,
+  title: string,
+  description: string | undefined,
+  slots: { slotStart: string; slotEnd: string }[]
+) {
+  await db.insert(scheduledMeetings).values({
+    eventId,
+    title,
+    description: description || null,
+    slots: JSON.stringify(slots),
+  });
+}
+
+export async function getScheduledMeeting(eventId: string) {
+  return db.query.scheduledMeetings.findFirst({
+    where: eq(scheduledMeetings.eventId, eventId),
+  });
 }
 
 export async function deleteExpiredEvents() {

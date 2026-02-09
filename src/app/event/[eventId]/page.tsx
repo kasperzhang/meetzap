@@ -66,7 +66,10 @@ export default async function EventPage({ params }: EventPageProps) {
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <BackLink href="/" type="home" />
 
-        <EventView event={event as any} />
+        <EventView
+          event={event as any}
+          scheduledMeeting={event.scheduledMeeting ?? null}
+        />
       </div>
     </main>
   );

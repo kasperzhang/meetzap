@@ -22,11 +22,10 @@ function getHeatmapColor(count: number, maxCount: number): string {
 
   const ratio = count / maxCount;
 
-  if (ratio >= 1) return "bg-[#00998A]";
-  if (ratio >= 0.75) return "bg-[#00CDB5]";
-  if (ratio >= 0.5) return "bg-[#5EFFEE]";
-  if (ratio >= 0.25) return "bg-[#C1FDF1]";
-  return "bg-[#FFFFFF]";
+  if (ratio >= 0.75) return "bg-[#03A48C]";
+  if (ratio >= 0.5) return "bg-[#00CEB6]";
+  if (ratio >= 0.25) return "bg-[#A7ECE4]";
+  return "bg-[#F3FFFD]";
 }
 
 export function HeatmapGrid({
@@ -190,10 +189,10 @@ export function HeatmapGrid({
         <span>Fewer</span>
         <div className="flex gap-0.5">
           <div className="w-4 h-4 bg-[#FFFFFF] border border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#C1FDF1] border border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#77E5D9] border border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#00CDB5] border border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#00998A] border border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#F3FFFD] border border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#A7ECE4] border border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#00CEB6] border border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#03A48C] border border-black rounded-sm" />
         </div>
         <span>More</span>
       </div>

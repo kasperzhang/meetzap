@@ -44,10 +44,10 @@ export const GridCell = React.memo(function GridCell({
       ref={ref}
       className={cn(
         "h-6 border border-black cursor-pointer transition-all select-none -ml-px -mt-px",
-        state === "selected" && "bg-[#A8E6CF]",
-        state === "pending-select" && "bg-[#A8E6CF]/60",
-        state === "pending-deselect" && "bg-[#FF6B6B]/60",
-        state === "none" && "bg-white hover:bg-[#FFE500]/30"
+        state === "selected" && "bg-[#00CEB6]",
+        state === "pending-select" && "bg-[#00CEB6]/60",
+        state === "pending-deselect" && "bg-[#A7ECE4]/60",
+        state === "none" && "bg-white hover:bg-[#F3FFFD]/30"
       )}
       onMouseDown={() => onMouseDown(cellId)}
       onMouseEnter={() => onMouseEnter(cellId)}

@@ -17,16 +17,16 @@ interface HeatmapGridProps {
   excludedParticipants?: Set<string>;
 }
 
-function getHeatmapColor(count: number, total: number): string {
-  if (count === 0 || total === 0) return "bg-white";
+function getHeatmapColor(count: number, maxCount: number): string {
+  if (count === 0 || maxCount === 0) return "bg-white";
 
-  const ratio = count / total;
+  const ratio = count / maxCount;
 
-  if (ratio === 1) return "bg-[#0d9488]";
-  if (ratio >= 0.75) return "bg-[#14b8a6]";
-  if (ratio >= 0.5) return "bg-[#2dd4bf]";
-  if (ratio >= 0.25) return "bg-[#5eead4]";
-  return "bg-[#99f6e4]";
+  if (ratio >= 1) return "bg-[#00998A]";
+  if (ratio >= 0.75) return "bg-[#00CDB5]";
+  if (ratio >= 0.5) return "bg-[#5EFFEE]";
+  if (ratio >= 0.25) return "bg-[#C1FDF1]";
+  return "bg-[#FFFFFF]";
 }
 
 export function HeatmapGrid({
@@ -83,6 +83,14 @@ export function HeatmapGrid({
     return totalParticipants - excludedParticipants.size;
   }, [totalParticipants, excludedParticipants]);
 
+  const maxCount = React.useMemo(() => {
+    let max = 0;
+    for (const [, value] of effectiveData) {
+      if (value.count > max) max = value.count;
+    }
+    return max;
+  }, [effectiveData]);
+
   const handleMouseEnter = (e: React.MouseEvent, cellId: string) => {
     setHoveredSlot(cellId);
     setTooltipPosition({ x: e.clientX, y: e.clientY });
@@ -132,7 +140,7 @@ export function HeatmapGrid({
                 const cellId = getSlotKey(slot);
                 const data = effectiveData.get(cellId);
                 const count = data?.count || 0;
-                const colorClass = getHeatmapColor(count, effectiveTotal);
+                const colorClass = getHeatmapColor(count, maxCount);
 
                 const isHighlighted =
                   highlightedParticipant &&
@@ -181,12 +189,11 @@ export function HeatmapGrid({
       <div className="mt-4 flex items-center gap-2 text-xs font-medium text-black">
         <span>Fewer</span>
         <div className="flex gap-0.5">
-          <div className="w-4 h-4 bg-white border border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#99f6e4] border border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#5eead4] border border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#2dd4bf] border border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#14b8a6] border border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#0d9488] border border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#FFFFFF] border border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#C1FDF1] border border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#77E5D9] border border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#00CDB5] border border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#00998A] border border-black rounded-sm" />
         </div>
         <span>More</span>
       </div>

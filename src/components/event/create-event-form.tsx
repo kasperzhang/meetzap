@@ -67,6 +67,13 @@ export function CreateEventForm() {
   });
 
   React.useEffect(() => {
+    const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (TIMEZONES.some((tz) => tz.value === detected)) {
+      setValue("timezone", detected);
+    }
+  }, [setValue]);
+
+  React.useEffect(() => {
     setValue(
       "dates",
       selectedDates.map((d) => format(d, "yyyy-MM-dd"))

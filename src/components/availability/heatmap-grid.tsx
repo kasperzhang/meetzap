@@ -13,6 +13,8 @@ interface HeatmapGridProps {
   slotDurationMinutes: number;
   aggregatedData: Map<string, { participants: string[]; count: number }>;
   totalParticipants: number;
+  highlightedParticipant?: string | null;
+  excludedParticipants?: Set<string>;
 }
 
 function getHeatmapColor(count: number, total: number): string {
@@ -20,12 +22,11 @@ function getHeatmapColor(count: number, total: number): string {
 
   const ratio = count / total;
 
-  // Light to dark teal gradient - matches neo-brutalism accent (#4ECDC4)
-  if (ratio === 1) return "bg-[#0d9488]";      // teal-600 (darkest)
-  if (ratio >= 0.75) return "bg-[#14b8a6]";    // teal-500
-  if (ratio >= 0.5) return "bg-[#2dd4bf]";     // teal-400
-  if (ratio >= 0.25) return "bg-[#5eead4]";    // teal-300
-  return "bg-[#99f6e4]";                        // teal-200 (lightest)
+  if (ratio === 1) return "bg-[#0d9488]";
+  if (ratio >= 0.75) return "bg-[#14b8a6]";
+  if (ratio >= 0.5) return "bg-[#2dd4bf]";
+  if (ratio >= 0.25) return "bg-[#5eead4]";
+  return "bg-[#99f6e4]";
 }
 
 export function HeatmapGrid({
@@ -35,6 +36,8 @@ export function HeatmapGrid({
   slotDurationMinutes,
   aggregatedData,
   totalParticipants,
+  highlightedParticipant,
+  excludedParticipants,
 }: HeatmapGridProps) {
   const [hoveredSlot, setHoveredSlot] = React.useState<string | null>(null);
   const [tooltipPosition, setTooltipPosition] = React.useState({ x: 0, y: 0 });
@@ -64,10 +67,23 @@ export function HeatmapGrid({
     [dates]
   );
 
-  const handleMouseEnter = (
-    e: React.MouseEvent,
-    cellId: string
-  ) => {
+  const effectiveData = React.useMemo(() => {
+    if (!excludedParticipants || excludedParticipants.size === 0) return aggregatedData;
+
+    const filtered = new Map<string, { participants: string[]; count: number }>();
+    for (const [key, value] of aggregatedData) {
+      const remaining = value.participants.filter((p) => !excludedParticipants.has(p));
+      filtered.set(key, { participants: remaining, count: remaining.length });
+    }
+    return filtered;
+  }, [aggregatedData, excludedParticipants]);
+
+  const effectiveTotal = React.useMemo(() => {
+    if (!excludedParticipants) return totalParticipants;
+    return totalParticipants - excludedParticipants.size;
+  }, [totalParticipants, excludedParticipants]);
+
+  const handleMouseEnter = (e: React.MouseEvent, cellId: string) => {
     setHoveredSlot(cellId);
     setTooltipPosition({ x: e.clientX, y: e.clientY });
   };
@@ -80,7 +96,7 @@ export function HeatmapGrid({
     setHoveredSlot(null);
   };
 
-  const hoveredData = hoveredSlot ? aggregatedData.get(hoveredSlot) : null;
+  const hoveredData = hoveredSlot ? effectiveData.get(hoveredSlot) : null;
 
   return (
     <div className="relative">
@@ -95,7 +111,7 @@ export function HeatmapGrid({
           {sortedDates.map((date) => (
             <div
               key={date.toISOString()}
-              className="h-16 flex flex-col items-center justify-center text-xs font-medium border-b black"
+              className="h-16 flex flex-col items-center justify-center text-xs font-medium border-b border-black"
             >
               <span className="text-neutral-500">{format(date, "EEE")}</span>
               <span>{format(date, "MMM d")}</span>
@@ -114,16 +130,20 @@ export function HeatmapGrid({
                 if (!slot) return <div key={`${dateStr}-${rowIndex}`} className="h-6" />;
 
                 const cellId = getSlotKey(slot);
-                const data = aggregatedData.get(cellId);
+                const data = effectiveData.get(cellId);
                 const count = data?.count || 0;
-                const colorClass = getHeatmapColor(count, totalParticipants);
+                const colorClass = getHeatmapColor(count, effectiveTotal);
+
+                const isHighlighted =
+                  highlightedParticipant &&
+                  data?.participants.includes(highlightedParticipant);
 
                 return (
                   <div
                     key={cellId}
                     className={cn(
-                      "h-6 border black -ml-px -mt-px cursor-pointer transition-all",
-                      colorClass,
+                      "h-6 border border-black -ml-px -mt-px cursor-pointer transition-all",
+                      isHighlighted ? "bg-[#FFE500]" : colorClass,
                       hoveredSlot === cellId && "ring-2 ring-[#FFE500] ring-offset-1"
                     )}
                     onMouseEnter={(e) => handleMouseEnter(e, cellId)}
@@ -146,7 +166,7 @@ export function HeatmapGrid({
           }}
         >
           <div className="font-bold mb-1">
-            {hoveredData.count} / {totalParticipants} available
+            {hoveredData.count} / {effectiveTotal} available
           </div>
           {hoveredData.participants.length > 0 && (
             <ul className="text-neutral-600 text-xs space-y-0.5">
@@ -161,12 +181,12 @@ export function HeatmapGrid({
       <div className="mt-4 flex items-center gap-2 text-xs font-medium text-black">
         <span>Fewer</span>
         <div className="flex gap-0.5">
-          <div className="w-4 h-4 bg-white border black rounded-sm" />
-          <div className="w-4 h-4 bg-[#99f6e4] border black rounded-sm" />
-          <div className="w-4 h-4 bg-[#5eead4] border black rounded-sm" />
-          <div className="w-4 h-4 bg-[#2dd4bf] border black rounded-sm" />
-          <div className="w-4 h-4 bg-[#14b8a6] border black rounded-sm" />
-          <div className="w-4 h-4 bg-[#0d9488] border black rounded-sm" />
+          <div className="w-4 h-4 bg-white border border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#99f6e4] border border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#5eead4] border border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#2dd4bf] border border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#14b8a6] border border-black rounded-sm" />
+          <div className="w-4 h-4 bg-[#0d9488] border border-black rounded-sm" />
         </div>
         <span>More</span>
       </div>

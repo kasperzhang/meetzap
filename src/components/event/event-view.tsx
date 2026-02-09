@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { HeatmapGrid } from "@/components/availability/heatmap-grid";
 import { getSlotKey, generateTimeSlots } from "@/lib/utils/grid";
+import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n";
 
 interface EventViewProps {
@@ -34,6 +35,20 @@ interface EventViewProps {
 export function EventView({ event }: EventViewProps) {
   const { t } = useLanguage();
   const [shareUrl, setShareUrl] = React.useState(`/event/${event.id}/respond`);
+  const [highlightedParticipant, setHighlightedParticipant] = React.useState<string | null>(null);
+  const [excludedParticipants, setExcludedParticipants] = React.useState<Set<string>>(new Set());
+
+  const toggleExcluded = (name: string) => {
+    setExcludedParticipants((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) {
+        next.delete(name);
+      } else {
+        next.add(name);
+      }
+      return next;
+    });
+  };
 
   React.useEffect(() => {
     setShareUrl(`${window.location.origin}/event/${event.id}/respond`);
@@ -157,6 +172,8 @@ export function EventView({ event }: EventViewProps) {
                 slotDurationMinutes={event.timeConfig.slotDurationMinutes}
                 aggregatedData={aggregatedData}
                 totalParticipants={event.participants.length}
+                highlightedParticipant={highlightedParticipant}
+                excludedParticipants={excludedParticipants}
               />
             )}
           </CardContent>
@@ -171,20 +188,32 @@ export function EventView({ event }: EventViewProps) {
               <p className="text-sm text-neutral-500">{t.eventView.noParticipants}</p>
             ) : (
               <ul className="space-y-2">
-                {event.participants.map((participant) => (
-                  <li
-                    key={participant.id}
-                    className="flex items-center justify-between text-sm"
-                  >
-                    <span>{participant.name}</span>
-                    <Link
-                      href={`/event/${event.id}/respond?participantId=${participant.id}`}
-                      className="text-neutral-500 hover:text-neutral-900"
+                {event.participants.map((participant) => {
+                  const isExcluded = excludedParticipants.has(participant.name);
+                  return (
+                    <li
+                      key={participant.id}
+                      className={cn(
+                        "flex items-center justify-between text-sm rounded-lg px-2 py-1 -mx-2 cursor-pointer transition-colors",
+                        isExcluded
+                          ? "opacity-40 line-through"
+                          : "hover:bg-[#FFE500]/30"
+                      )}
+                      onMouseEnter={() => !isExcluded && setHighlightedParticipant(participant.name)}
+                      onMouseLeave={() => setHighlightedParticipant(null)}
+                      onClick={() => toggleExcluded(participant.name)}
                     >
-                      {t.eventView.edit}
-                    </Link>
-                  </li>
-                ))}
+                      <span>{participant.name}</span>
+                      <Link
+                        href={`/event/${event.id}/respond?participantId=${participant.id}`}
+                        className="text-neutral-500 hover:text-neutral-900"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {t.eventView.edit}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             )}
 

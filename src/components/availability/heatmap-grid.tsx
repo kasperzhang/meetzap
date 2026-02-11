@@ -19,15 +19,27 @@ interface HeatmapGridProps {
   onSlotsSelected?: (slots: string[]) => void;
 }
 
-function getHeatmapColor(count: number, maxCount: number): string {
-  if (count === 0 || maxCount === 0) return "bg-white";
+// Interpolate between two hex colors; t in [0, 1]
+function lerpColor(a: string, b: string, t: number): string {
+  const parse = (hex: string) => [
+    parseInt(hex.slice(1, 3), 16),
+    parseInt(hex.slice(3, 5), 16),
+    parseInt(hex.slice(5, 7), 16),
+  ];
+  const [r1, g1, b1] = parse(a);
+  const [r2, g2, b2] = parse(b);
+  const r = Math.round(r1 + (r2 - r1) * t);
+  const g = Math.round(g1 + (g2 - g1) * t);
+  const bl = Math.round(b1 + (b2 - b1) * t);
+  return `#${((1 << 24) | (r << 16) | (g << 8) | bl).toString(16).slice(1)}`;
+}
 
-  const ratio = count / maxCount;
-
-  if (ratio >= 0.75) return "bg-[#03A48C]";
-  if (ratio >= 0.5) return "bg-[#00CEB6]";
-  if (ratio >= 0.25) return "bg-[#A7ECE4]";
-  return "bg-[#F3FFFD]";
+// Generate a color for count out of total, interpolating from light teal to dark teal
+function getHeatmapColorHex(count: number, total: number): string {
+  if (count === 0 || total === 0) return "#FFFFFF";
+  // t goes from 0 (count=1) to 1 (count=total)
+  const t = total === 1 ? 1 : (count - 1) / (total - 1);
+  return lerpColor("#D4F5EF", "#03A48C", t);
 }
 
 export function HeatmapGrid({
@@ -92,13 +104,14 @@ export function HeatmapGrid({
     return totalParticipants - excludedParticipants.size;
   }, [totalParticipants, excludedParticipants]);
 
-  const maxCount = React.useMemo(() => {
-    let max = 0;
-    for (const [, value] of effectiveData) {
-      if (value.count > max) max = value.count;
+  // Generate legend colors: one swatch per count level (0 through effectiveTotal)
+  const legendColors = React.useMemo(() => {
+    const colors: string[] = [getHeatmapColorHex(0, effectiveTotal)];
+    for (let i = 1; i <= effectiveTotal; i++) {
+      colors.push(getHeatmapColorHex(i, effectiveTotal));
     }
-    return max;
-  }, [effectiveData]);
+    return colors;
+  }, [effectiveTotal]);
 
   // Compute cells in drag rectangle
   const dragSelectedCells = React.useMemo(() => {
@@ -221,7 +234,7 @@ export function HeatmapGrid({
                 const cellId = getSlotKey(slot);
                 const data = effectiveData.get(cellId);
                 const count = data?.count || 0;
-                const colorClass = getHeatmapColor(count, maxCount);
+                const heatmapHex = getHeatmapColorHex(count, effectiveTotal);
 
                 const isHighlighted =
                   highlightedParticipant &&
@@ -229,6 +242,12 @@ export function HeatmapGrid({
 
                 const isSelected = selectedSlots.has(cellId);
                 const isDragSelected = dragSelectedCells.has(cellId);
+
+                // Determine if this cell uses inline heatmap color
+                const useInlineColor =
+                  !isSelected &&
+                  !(isDragSelected && isSelecting) &&
+                  !isHighlighted;
 
                 return (
                   <div
@@ -243,9 +262,10 @@ export function HeatmapGrid({
                             ? "bg-[#FEF3C7] border-[#D4A800] z-10 relative"
                             : isHighlighted
                               ? "bg-[#FFE500] border-black"
-                              : `${colorClass} border-black`,
+                              : "border-black",
                       hoveredSlot === cellId && !isSelecting && !isSelected && "ring-2 ring-[#FFE500] ring-offset-1 z-10 relative"
                     )}
+                    style={useInlineColor ? { backgroundColor: heatmapHex } : undefined}
                     onMouseEnter={(e) => {
                       handleMouseEnter(e, cellId);
                       handleCellMouseEnterSelection(dateIndex, rowIndex);
@@ -285,11 +305,13 @@ export function HeatmapGrid({
       <div className="mt-4 flex items-center gap-2 text-xs font-medium text-black">
         <span>Fewer</span>
         <div className="flex gap-0.5">
-          <div className="w-4 h-4 bg-[#FFFFFF] border border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#F3FFFD] border border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#A7ECE4] border border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#00CEB6] border border-black rounded-sm" />
-          <div className="w-4 h-4 bg-[#03A48C] border border-black rounded-sm" />
+          {legendColors.map((color, i) => (
+            <div
+              key={i}
+              className="w-4 h-4 border border-black rounded-sm"
+              style={{ backgroundColor: color }}
+            />
+          ))}
         </div>
         <span>More</span>
       </div>

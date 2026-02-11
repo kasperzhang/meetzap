@@ -17,8 +17,8 @@ import { createEventSchema, type CreateEventInput } from "@/lib/validations/even
 import { useLanguage, interpolate } from "@/i18n";
 
 const TIMEZONES = [
-  { value: "America/Toronto", label: "Canada/Toronto" },
-  { value: "America/Vancouver", label: "Canada/Vancouver" },
+  { value: "America/Toronto", label: "America/Toronto" },
+  { value: "America/Vancouver", label: "America/Vancouver" },
   { value: "America/New_York", label: "America/New_York" },
   { value: "America/Chicago", label: "America/Chicago" },
   { value: "America/Denver", label: "America/Denver" },
